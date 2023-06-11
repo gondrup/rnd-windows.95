@@ -3,10 +3,120 @@
     <head>
         <title>Windows 95</title>
         <style>
+            /* "Appearance" styles usually set in Win 95 Display Properties */
+            .appearance-3d-objects { background: #c0c0c0; color: #000; }
+            .appearance-active-title-bar { height: 14px; padding: 2px; background: #000080; font-size: 8pt; color: #fff; font-weight: bold; }
+            .appearance-active-window-border { border: 1px solid #c0c0c0; }
+            .appearance-application-background { background: #808080; }
+            .appearance-caption-buttons { width: 18px; height: 18px; }
+            .appearance-desktop { background: #008080; }
+            .appearance-icon { margin: 0 10px 10px 0; }
+            .appearance-icon-image { width: 32px; height: 32px; }
+            .appearance-icon-text { font-size: 8pt; }
+            .appearance-inactive-title-bar { background: #000080; color: #c0c0c0; font-weight: bold; }
+            .appearance-inactive-window-border { border: 1px solid #c0c0c0; }
+            .appearance-menu { height: 18px; background: #c0c0c0; font-size: 8pt; color: #000 }
+            .appearance-message-box { font-size: 8pt; color: #000; }
+            .appearance-palette-title { height: 15px; font-size: 8pt; }
+            .appearance-scrollbar { width: 16px; }
+            .appearance-selected-items { background: #000080; color: #fff; }
+            .appearance-tooltip { background: #ffffe1; font-size: 8pt; color: #000; }
+            .appearance-window-content { background: #000; color: #000; }
 
+            body {
+                background: #000;
+                font: 8pt sans-serif;
+            }
+
+            #crt-output {
+                width: 640px;
+                height: 480px;
+
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                -webkit-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+            }
+
+            #desktop {
+                width: 100%;
+                height: 100%;
+            }
+
+            .threed-object {
+                border: 1px solid;
+                border-color: #fff #808080 #808080 #fff;
+            }
+
+            .threed-object > div {
+                position: relative;
+                box-sizing: border-box;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+            }
+
+            .window-container {
+                position: absolute;
+            }
+
+            .title-bar {
+                position: relative;
+            }
+
+            .title-bar > .title {
+                float: left;
+            }
+
+            .title-bar > .caption-buttons {
+                float: right;
+                overflow: hidden;
+            }
+
+            .title-bar > .caption-buttons > div {
+                float: left;
+                margin-left: 2px;
+            }
         </style>
     </head>
     <body>
+        <main id="crt-output">
+            <div id="desktop" class="appearance-desktop">
+                <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
+                    <div class="window appearance-active-window-border">
+                        <div class="title-bar appearance-active-title-bar">
+                            <div class="title">Example Window</div>
+                            <div class="caption-buttons">
+                                <div class="threed-object appearance-3d-objects">
+                                    <div class="caption-button appearance-caption-buttons">
+                                        _
+                                    </div>
+                                </div>
+                                <div class="threed-object appearance-3d-objects">
+                                    <div class="caption-button appearance-caption-buttons">
+                                        []
+                                    </div>
+                                </div>
+                                <div class="threed-object appearance-3d-objects">
+                                    <div class="caption-button appearance-caption-buttons">
+                                        X
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p>This is an example window.</p>
+                        </div>
+                        <div class="threed-object appearance-3d-objects">
+                            <div class="button">
+                                Okay
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
         <script>
         </script>
     </body>
