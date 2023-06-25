@@ -10,7 +10,7 @@
             .appearance-application-background { background: #808080; }
             .appearance-caption-buttons { width: 18px; height: 18px; }
             .appearance-desktop { background: #008080; }
-            .appearance-icon { margin: 0 10px 10px 0; }
+            .appearance-icon { margin: 10px; }
             .appearance-icon-image { width: 32px; height: 32px; }
             .appearance-icon-text { font-size: 8pt; }
             .appearance-inactive-title-bar { background: #000080; color: #c0c0c0; font-weight: bold; }
@@ -42,6 +42,16 @@
             #desktop {
                 width: 100%;
                 height: 100%;
+                overflow: hidden;
+            }
+
+            #desktop .icon {
+                color: #fff;
+            }
+
+            .icon {
+                width: 64px;
+                text-align: center;
             }
 
             .threed-object {
@@ -88,35 +98,39 @@
     <body>
         <main id="crt-output">
             <div id="desktop" class="appearance-desktop">
-                <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
-                    <div class="window appearance-active-window-border">
-                        <div class="title-bar appearance-active-title-bar">
-                            <div class="title">Example Window</div>
-                            <div class="caption-buttons">
-                                <div class="threed-object appearance-3d-objects">
-                                    <div class="caption-button appearance-caption-buttons">
-                                        _
-                                    </div>
+                <div id="desktop-icon-my-computer" class="icon appearance-icon">
+                    <img class="appearance-icon-image" src="img/My Computer.png">
+                    <div class="text appearance-icon-text">My Computer</div>
+                </div>
+            </div>
+            <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
+                <div class="window appearance-active-window-border">
+                    <div class="title-bar appearance-active-title-bar">
+                        <div class="title">Example Window</div>
+                        <div class="caption-buttons">
+                            <div class="threed-object appearance-3d-objects">
+                                <div class="caption-button appearance-caption-buttons">
+                                    _
                                 </div>
-                                <div class="threed-object appearance-3d-objects">
-                                    <div class="caption-button appearance-caption-buttons">
-                                        []
-                                    </div>
+                            </div>
+                            <div class="threed-object appearance-3d-objects">
+                                <div class="caption-button appearance-caption-buttons">
+                                    []
                                 </div>
-                                <div class="threed-object appearance-3d-objects">
-                                    <div class="caption-button appearance-caption-buttons">
-                                        X
-                                    </div>
+                            </div>
+                            <div class="threed-object appearance-3d-objects">
+                                <div class="caption-button appearance-caption-buttons">
+                                    X
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            <p>This is an example window.</p>
-                        </div>
-                        <div class="threed-object appearance-3d-objects">
-                            <div class="button">
-                                Okay
-                            </div>
+                    </div>
+                    <div>
+                        <p>This is an example window.</p>
+                    </div>
+                    <div class="threed-object appearance-3d-objects">
+                        <div class="button">
+                            Okay
                         </div>
                     </div>
                 </div>
