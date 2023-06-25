@@ -21,7 +21,7 @@
             .appearance-scrollbar { width: 16px; }
             .appearance-selected-items { background: #000080; color: #fff; }
             .appearance-tooltip { background: #ffffe1; font-size: 8pt; color: #000; }
-            .appearance-window-content { background: #000; color: #000; }
+            .appearance-window-content { background: #fff; color: #000; }
 
             body {
                 background: #000;
@@ -92,6 +92,14 @@
                 margin-left: 2px;
             }
 
+            .window-content {
+                border: 1px solid;
+                border-color: #fff #808080 #808080 #fff;
+
+                width: 100%;
+                height: 100%;
+            }
+
             .button {
                 width: auto;
             }
@@ -105,6 +113,38 @@
                     <div class="text appearance-icon-text">My Computer</div>
                 </div>
             </div>
+            <div id="threed-objects">
+            </div>
+        </main>
+        <template id="explorer-window-template">
+            <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
+                <div class="window appearance-active-window-border">
+                    <div class="title-bar appearance-active-title-bar">
+                        <div class="title">Example Window</div>
+                        <div class="caption-buttons">
+                            <div class="button-minimise threed-object appearance-3d-objects">
+                                <div class="caption-button appearance-caption-buttons">
+                                    <img src="img/window-minimise.png">
+                                </div>
+                            </div>
+                            <div class="button-maximise threed-object appearance-3d-objects">
+                                <div class="caption-button appearance-caption-buttons">
+                                    <img src="img/window-maximise.png">
+                                </div>
+                            </div>
+                            <div class="button-close threed-object appearance-3d-objects">
+                                <div class="caption-button appearance-caption-buttons">
+                                    <img src="img/window-close.png">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="window-content appearance-window-content">
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template id="test-alert-template">
             <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
                 <div class="window appearance-active-window-border">
                     <div class="title-bar appearance-active-title-bar">
@@ -137,46 +177,80 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </template>
         <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
         <script>
-            const position = { x: 0, y: 0 }
+            const container = document.getElementById('threed-objects');
+            const explorerWindowTemplate = document.getElementById('explorer-window-template');
 
-            interact('.window .title-bar').draggable({
-                listeners: {
-                    start (event) {
-                        console.log(event.type, event.target)
-                    },
-                    move (event) {
-                        position.x += event.dx
-                        position.y += event.dy
+            class Window {
 
-                        event.target.parentElement.parentElement.style.transform = `translate(${position.x}px, ${position.y}px)`
-                    },
+                bindInteractions() {
+                    const position = { x: 0, y: 0 }
+
+                    interact('.window .title-bar').draggable({
+                        listeners: {
+                            start (event) {
+                                console.log(event.type, event.target)
+                            },
+                            move (event) {
+                                position.x += event.dx
+                                position.y += event.dy
+
+                                event.target.parentElement.parentElement.style.transform = `translate(${position.x}px, ${position.y}px)`
+                            },
+                        }
+                    })
+
+
+                    interact('.window-container')
+                        .resizable({
+                            edges: { top: true, left: true, bottom: true, right: true },
+                            listeners: {
+                            move: function (event) {
+                                let { x, y } = event.target.dataset;
+
+                                x = (parseFloat(x) || 0) + event.deltaRect.left;
+                                y = (parseFloat(y) || 0) + event.deltaRect.top;
+
+                                Object.assign(event.target.style, {
+                                    width: `${event.rect.width}px`,
+                                    height: `${event.rect.height}px`,
+                                    transform: `translate(${x}px, ${y}px)`
+                                })
+
+                                Object.assign(event.target.dataset, { x, y })
+                            }
+                        }
+                    })
                 }
-            })
+            }
 
+            class ExplorerWindow extends Window {
+                constructor() {
+                    super();
 
-            interact('.window-container')
-                .resizable({
-                    edges: { top: true, left: true, bottom: true, right: true },
-                    listeners: {
-                    move: function (event) {
-                        let { x, y } = event.target.dataset;
+                    this.element = explorerWindowTemplate.content.firstElementChild.cloneNode(true);
+                    container.appendChild(this.element);
 
-                        x = (parseFloat(x) || 0) + event.deltaRect.left;
-                        y = (parseFloat(y) || 0) + event.deltaRect.top;
+                    this.closeButton = this.element.getElementsByClassName('button-close')[0];
+                    this.closeButton.addEventListener('click', (e) => { this.close(); });
 
-                        Object.assign(event.target.style, {
-                            width: `${event.rect.width}px`,
-                            height: `${event.rect.height}px`,
-                            transform: `translate(${x}px, ${y}px)`
-                        })
-
-                        Object.assign(event.target.dataset, { x, y })
-                    }
+                    this.bindInteractions();
                 }
-            })
+
+                close() {
+                    container.removeChild(this.element);
+                }
+            }
+
+            const windows = [];
+
+            const myComputerIcon = document.querySelector('#desktop-icon-my-computer');
+            myComputerIcon.addEventListener('dblclick', (e) => {
+                const window = new ExplorerWindow();
+                windows.push(window);
+            });
         </script>
     </body>
 </html>
