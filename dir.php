@@ -1,6 +1,6 @@
 <?php
 
-define('BASE_DIR', '/home/adrian/Dev/rnd-windows-95/c');
+define('BASE_DIR', __dir__.'/c');
 
 $dir = $_GET['dir'];
 $contents = [
