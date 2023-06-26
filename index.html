@@ -94,7 +94,8 @@
 
             .window-content {
                 border: 1px solid;
-                border-color: #fff #808080 #808080 #fff;
+                border-color: #7b7d7b #fff #fff #7b7d7b;
+                box-sizing: border-box;
 
                 width: 100%;
                 height: 100%;
@@ -108,19 +109,21 @@
     <body>
         <main id="crt-output">
             <div id="desktop" class="appearance-desktop">
-                <div id="desktop-icon-my-computer" class="icon appearance-icon">
-                    <img class="appearance-icon-image" src="img/My Computer.png">
-                    <div class="text appearance-icon-text">My Computer</div>
-                </div>
             </div>
             <div id="threed-objects">
             </div>
         </main>
+        <template id="icon-template">
+            <div class="icon appearance-icon">
+                <img class="appearance-icon-image" src="img/Windows document.png">
+                <div class="text appearance-icon-text">Document</div>
+            </div>
+        </template>
         <template id="explorer-window-template">
-            <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
+            <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px; width: 300px; height: 240px;">
                 <div class="window appearance-active-window-border">
                     <div class="title-bar appearance-active-title-bar">
-                        <div class="title">Example Window</div>
+                        <div class="title"></div>
                         <div class="caption-buttons">
                             <div class="button-minimise threed-object appearance-3d-objects">
                                 <div class="caption-button appearance-caption-buttons">
@@ -144,47 +147,36 @@
                 </div>
             </div>
         </template>
-        <template id="test-alert-template">
-            <div class="threed-object window-container appearance-3d-objects" style="left: 150px; top: 80px;width: 200px; height: 120px;">
-                <div class="window appearance-active-window-border">
-                    <div class="title-bar appearance-active-title-bar">
-                        <div class="title">Example Window</div>
-                        <div class="caption-buttons">
-                            <div class="threed-object appearance-3d-objects">
-                                <div class="caption-button appearance-caption-buttons">
-                                    <img src="img/window-minimise.png">
-                                </div>
-                            </div>
-                            <div class="threed-object appearance-3d-objects">
-                                <div class="caption-button appearance-caption-buttons">
-                                    <img src="img/window-maximise.png">
-                                </div>
-                            </div>
-                            <div class="threed-object appearance-3d-objects">
-                                <div class="caption-button appearance-caption-buttons">
-                                    <img src="img/window-close.png">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <p>This is an example window.</p>
-                    </div>
-                    <div class="threed-object appearance-3d-objects">
-                        <div class="button">
-                            Okay
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
         <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
         <script>
             const container = document.getElementById('threed-objects');
+            const desktop = document.getElementById('desktop');
+            const iconTemplate = document.getElementById('icon-template');
             const explorerWindowTemplate = document.getElementById('explorer-window-template');
 
-            class Window {
+            async function getFolderContents(dir) {
+                const response = await fetch('http://127.0.0.1:8000/dir.php?' + new URLSearchParams({
+                    dir: dir,
+                }));
+                const json = await response.json();
 
+                return json;
+            }
+
+            class Icon {
+                constructor(container, imgPath, title, onDblClick) {
+                    this.element = iconTemplate.content.firstElementChild.cloneNode(true);
+                    const imgElement = this.element.querySelector('img');
+                    const textElement = this.element.querySelector('.text');
+                    imgElement.src = imgPath;
+                    textElement.textContent = title;
+                    container.appendChild(this.element);
+
+                    this.element.addEventListener('dblclick', onDblClick );
+                }
+            }
+
+            class Window {
                 bindInteractions() {
                     const position = { x: 0, y: 0 }
 
@@ -224,31 +216,58 @@
                         }
                     })
                 }
-            }
-
-            class ExplorerWindow extends Window {
-                constructor() {
-                    super();
-
-                    this.element = explorerWindowTemplate.content.firstElementChild.cloneNode(true);
-                    container.appendChild(this.element);
-
-                    this.closeButton = this.element.getElementsByClassName('button-close')[0];
-                    this.closeButton.addEventListener('click', (e) => { this.close(); });
-
-                    this.bindInteractions();
-                }
 
                 close() {
                     container.removeChild(this.element);
                 }
             }
 
+            class ExplorerWindow extends Window {
+                constructor(title, dir='') {
+                    super();
+
+                    this.dir = dir;
+                    this.icons = [];
+                    this.element = explorerWindowTemplate.content.firstElementChild.cloneNode(true);
+                    const titleElement = this.element.querySelector('.title');
+                    titleElement.textContent = title;
+                    container.appendChild(this.element);
+
+                    this.closeButton = this.element.getElementsByClassName('button-close')[0];
+                    this.closeButton.addEventListener('click', (e) => { this.close(); });
+
+                    this.bindInteractions();
+                    this.loadContents(dir);
+                }
+
+                async loadContents(dir) {
+                    this.folderContents = await getFolderContents(dir);
+                    //console.log(this.folderContents);
+
+                    function addIcon(isFolder, title) {
+                        const imgPath = isFolder ? 'img/Folder.png' : 'img/Notepad document.png';
+                        const cb = isFolder ? (e) => {
+                            const window = new ExplorerWindow(title, `${this.dir}/${title}`);
+                            windows.push(window);
+                        } : null;
+                        const icon = new Icon(container, imgPath, title, cb);
+                        this.icons.push(icon);
+                    }
+                    
+                    const container = this.element.querySelector('.window-content');
+                    for (let i in this.folderContents.folders) {
+                        addIcon.call(this, true, this.folderContents.folders[i]);
+                    }
+                    for (let i in this.folderContents.files) {
+                        addIcon.call(this, false, this.folderContents.files[i]);
+                    }
+                }
+            }
+
             const windows = [];
 
-            const myComputerIcon = document.querySelector('#desktop-icon-my-computer');
-            myComputerIcon.addEventListener('dblclick', (e) => {
-                const window = new ExplorerWindow();
+            const myComputerIcon = new Icon(desktop, 'img/My Computer.png', 'My Computer', (e) => {
+                const window = new ExplorerWindow('My Computer');
                 windows.push(window);
             });
         </script>
